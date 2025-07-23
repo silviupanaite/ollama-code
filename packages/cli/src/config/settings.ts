@@ -20,17 +20,21 @@ import stripJsonComments from 'strip-json-comments';
 import { DefaultLight } from '../ui/themes/default-light.js';
 import { DefaultDark } from '../ui/themes/default.js';
 
-export const SETTINGS_DIRECTORY_NAME = '.qwen';
+export const SETTINGS_DIRECTORY_NAME = '.ollama';
 export const USER_SETTINGS_DIR = path.join(homedir(), SETTINGS_DIRECTORY_NAME);
 export const USER_SETTINGS_PATH = path.join(USER_SETTINGS_DIR, 'settings.json');
 
+// Ollama-specific config paths
+export const OLLAMA_CONFIG_DIR = path.join(homedir(), '.config', 'ollama-code');
+export const OLLAMA_CONFIG_PATH = path.join(OLLAMA_CONFIG_DIR, 'config.json');
+
 function getSystemSettingsPath(): string {
   if (platform() === 'darwin') {
-    return '/Library/Application Support/QwenCode/settings.json';
+    return '/Library/Application Support/OllamaCode/settings.json';
   } else if (platform() === 'win32') {
-    return 'C:\\ProgramData\\qwen-code\\settings.json';
+    return 'C:\\ProgramData\\ollama-code\\settings.json';
   } else {
-    return '/etc/qwen-code/settings.json';
+    return '/etc/ollama-code/settings.json';
   }
 }
 
@@ -48,6 +52,12 @@ export interface CheckpointingSettings {
 
 export interface AccessibilitySettings {
   disableLoadingPhrases?: boolean;
+}
+
+export interface OllamaConfig {
+  baseUrl?: string;
+  model?: string;
+  apiKey?: string;
 }
 
 export interface Settings {
@@ -135,11 +145,20 @@ export class LoadedSettings {
   }
 
   private computeMergedSettings(): Settings {
-    return {
+    const merged = {
       ...this.user.settings,
       ...this.workspace.settings,
       ...this.system.settings,
     };
+    
+    // Auto-detect auth type if not explicitly set
+    if (!merged.selectedAuthType) {
+      if (process.env.OLLAMA_API_KEY !== undefined || process.env.OLLAMA_BASE_URL || process.env.OPENAI_API_KEY || process.env.OPENAI_BASE_URL) {
+        merged.selectedAuthType = AuthType.USE_OPENAI;
+      }
+    }
+    
+    return merged;
   }
 
   forScope(scope: SettingScope): SettingsFile {
@@ -261,6 +280,31 @@ export function setUpCloudShellEnvironment(envFilePath: string | null): void {
   }
 }
 
+export function loadOllamaConfig(): OllamaConfig {
+  try {
+    if (fs.existsSync(OLLAMA_CONFIG_PATH)) {
+      const configContent = fs.readFileSync(OLLAMA_CONFIG_PATH, 'utf8');
+      const config = JSON.parse(stripJsonComments(configContent)) as OllamaConfig;
+      
+      // Set environment variables from config if not already set
+      if (config.baseUrl && !process.env.OLLAMA_BASE_URL && !process.env.OPENAI_BASE_URL) {
+        process.env.OLLAMA_BASE_URL = config.baseUrl;
+      }
+      if (config.model && !process.env.OLLAMA_MODEL && !process.env.OPENAI_MODEL) {
+        process.env.OLLAMA_MODEL = config.model;
+      }
+      if (config.apiKey && !process.env.OLLAMA_API_KEY && !process.env.OPENAI_API_KEY) {
+        process.env.OLLAMA_API_KEY = config.apiKey;
+      }
+      
+      return config;
+    }
+  } catch (error) {
+    // Silently ignore config loading errors - fall back to env vars or defaults
+  }
+  return {};
+}
+
 export function loadEnvironment(): void {
   const envFilePath = findEnvFile(process.cwd());
 
@@ -271,6 +315,9 @@ export function loadEnvironment(): void {
   if (envFilePath) {
     dotenv.config({ path: envFilePath, quiet: true });
   }
+  
+  // Load Ollama config after environment variables
+  loadOllamaConfig();
 }
 
 /**

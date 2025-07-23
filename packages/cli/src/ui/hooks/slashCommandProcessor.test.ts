@@ -179,7 +179,7 @@ describe('useSlashCommandProcessor', () => {
   const getProcessorHook = (showToolDescriptions: boolean = false) => {
     const settings = {
       merged: {
-        contextFileName: 'QWEN.md',
+        contextFileName: 'OLLAMA.md',
       },
     } as unknown as LoadedSettings;
     return renderHook(() =>

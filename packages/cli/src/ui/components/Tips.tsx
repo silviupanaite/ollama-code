@@ -28,9 +28,9 @@ export const Tips: React.FC<TipsProps> = ({ config }) => {
         <Text color={Colors.Foreground}>
           3. Create{' '}
           <Text bold color={Colors.AccentPurple}>
-            QWEN.md
+            OLLAMA.md
           </Text>{' '}
-          files to customize your interactions with Qwen Code.
+          files to customize your interactions with Ollama Code.
         </Text>
       )}
       <Text color={Colors.Foreground}>

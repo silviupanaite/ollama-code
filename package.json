@@ -1,5 +1,5 @@
 {
-  "name": "@qwen-code/qwen-code",
+  "name": "@tcsenpai/ollama-code",
   "version": "0.0.1-alpha.8",
   "engines": {
     "node": ">=20"
@@ -10,17 +10,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+http://gitlab.alibaba-inc.com/Qwen-Coder/qwen-code.git"
-  },
-  "config": {
-    "sandboxImageUri": "us-docker.pkg.dev/gemini-code-dev/gemini-cli/sandbox:0.0.1-alpha.8"
+    "url": "git+https://github.com/tcsenpai/ollama-code.git"
   },
   "scripts": {
     "start": "node scripts/start.js",
     "debug": "cross-env DEBUG=1 node --inspect-brk scripts/start.js",
-    "auth:npm": "npx google-artifactregistry-auth",
-    "auth:docker": "gcloud auth configure-docker us-west1-docker.pkg.dev",
-    "auth": "npm run auth:npm && npm run auth:docker",
     "generate": "node scripts/generate-git-commit-info.js",
     "build": "node scripts/build.js",
     "build:all": "npm run build && npm run build:sandbox",
@@ -48,7 +42,7 @@
     "clean": "node scripts/clean.js"
   },
   "bin": {
-    "qwen": "bundle/gemini.js"
+    "ollama-code": "bundle/ollama.js"
   },
   "files": [
     "bundle/",
@@ -83,6 +77,6 @@
     "yargs": "^18.0.0"
   },
   "dependencies": {
-    "@qwen-code/qwen-code": "^0.0.1-alpha.8"
+    "@tcsenpai/ollama-code-core": "^0.0.1-alpha.8"
   }
 }

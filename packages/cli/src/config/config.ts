@@ -63,16 +63,16 @@ export interface CliArgs {
 
 export async function parseArguments(): Promise<CliArgs> {
   const yargsInstance = yargs(hideBin(process.argv))
-    .scriptName('qwen')
+    .scriptName('ollama')
     .usage(
       '$0 [options]',
-      'Qwen Code - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
+      'Ollama Code - Launch an interactive CLI, use -p/--prompt for non-interactive mode',
     )
     .option('model', {
       alias: 'm',
       type: 'string',
       description: `Model`,
-      default: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+      default: process.env.OLLAMA_MODEL || process.env.OPENAI_MODEL || DEFAULT_GEMINI_MODEL,
     })
     .option('prompt', {
       alias: 'p',

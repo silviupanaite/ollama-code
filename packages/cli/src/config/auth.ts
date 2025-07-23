@@ -39,8 +39,12 @@ export const validateAuthMethod = (authMethod: string): string | null => {
   }
 
   if (authMethod === AuthType.USE_OPENAI) {
-    if (!process.env.OPENAI_API_KEY) {
-      return 'OPENAI_API_KEY environment variable not found. You can enter it interactively or add it to your .env file.';
+    // Check for Ollama or OpenAI API key, allowing empty key for Ollama local setups
+    const hasOllamaKey = process.env.OLLAMA_API_KEY !== undefined;
+    const hasOpenAIKey = process.env.OPENAI_API_KEY !== undefined;
+    
+    if (!hasOllamaKey && !hasOpenAIKey) {
+      return 'OPENAI_API_KEY or OLLAMA_API_KEY environment variable not found. You can enter it interactively or add it to your .env file.';
     }
     return null;
   }
@@ -58,4 +62,16 @@ export const setOpenAIBaseUrl = (baseUrl: string): void => {
 
 export const setOpenAIModel = (model: string): void => {
   process.env.OPENAI_MODEL = model;
+};
+
+export const setOllamaApiKey = (apiKey: string): void => {
+  process.env.OLLAMA_API_KEY = apiKey;
+};
+
+export const setOllamaBaseUrl = (baseUrl: string): void => {
+  process.env.OLLAMA_BASE_URL = baseUrl;
+};
+
+export const setOllamaModel = (model: string): void => {
+  process.env.OLLAMA_MODEL = model;
 };

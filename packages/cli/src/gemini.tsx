@@ -323,16 +323,23 @@ async function validateNonInterActiveAuth(
   nonInteractiveConfig: Config,
 ) {
   // making a special case for the cli. many headless environments might not have a settings.json set
-  // so if GEMINI_API_KEY is set, we'll use that. However since the oauth things are interactive anyway, we'll
+  // so if GEMINI_API_KEY, OLLAMA_API_KEY, or OPENAI_API_KEY is set, we'll use that. However since the oauth things are interactive anyway, we'll
   // still expect that exists
-  if (!selectedAuthType && !process.env.GEMINI_API_KEY) {
+  if (!selectedAuthType && !process.env.GEMINI_API_KEY && !process.env.OLLAMA_API_KEY && !process.env.OPENAI_API_KEY && !process.env.OLLAMA_BASE_URL && !process.env.OPENAI_BASE_URL) {
     console.error(
-      `Please set an Auth method in your ${USER_SETTINGS_PATH} OR specify GEMINI_API_KEY env variable file before running`,
+      `Please set an Auth method in your ${USER_SETTINGS_PATH} OR specify OLLAMA_API_KEY/OPENAI_API_KEY/GEMINI_API_KEY env variable file before running`,
     );
     process.exit(1);
   }
 
-  selectedAuthType = selectedAuthType || AuthType.USE_GEMINI;
+  // Auto-detect auth type: prefer Ollama/OpenAI if configured, otherwise use Gemini
+  if (!selectedAuthType) {
+    if (process.env.OLLAMA_API_KEY !== undefined || process.env.OLLAMA_BASE_URL || process.env.OPENAI_API_KEY || process.env.OPENAI_BASE_URL) {
+      selectedAuthType = AuthType.USE_OPENAI;
+    } else {
+      selectedAuthType = AuthType.USE_GEMINI;
+    }
+  }
   const err = validateAuthMethod(selectedAuthType);
   if (err != null) {
     console.error(err);
