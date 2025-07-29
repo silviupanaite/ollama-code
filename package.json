@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tcsenpai/ollama-code.git"
+    "url": "git+https://github.com/silviupanaite/ollama-code.git"
   },
   "scripts": {
     "start": "node scripts/start.js",
@@ -77,6 +77,6 @@
     "yargs": "^18.0.0"
   },
   "dependencies": {
-    "@tcsenpai/ollama-code-core": "^0.0.1-alpha.8"
+    "@silviupanaite/ollama-code-core": "git+ssh://git@github.com/silviupanaite/ollama-code.git"
   }
 }
