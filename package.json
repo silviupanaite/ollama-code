@@ -77,6 +77,6 @@
     "yargs": "^18.0.0"
   },
   "dependencies": {
-    "@silviupanaite/ollama-code-core": "git+ssh://git@github.com/silviupanaite/ollama-code.git"
+    "@silviupanaite/ollama-code-core": "git+ssh://git@github.com/silviupanaite/ollama-code.git#main:packages/core"
   }
 }
